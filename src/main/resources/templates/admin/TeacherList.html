@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <div th:replace="include/bootstrap :: bootstrap"></div>
+</head>
+<body>
+<div th:replace="include/AdminNav :: AdminNav"></div>
+<div class="table-responsive" style="margin-left: 18%">
+    <table class="table table-striped"  >
+        <thead>
+        <tr>
+            <th colspan="5" style="text-align:left ;font-size: 20px"><button class="line btn btn-primary btn-sm" onclick="add()" >Add Teacher</button>&nbsp;&nbsp;&nbsp;
+        </tr>
+        <tr>
+            <th>ID</th>
+            <th>Work ID</th>
+            <th>Password</th>
+            <th>Name</th>
+            <th>Class</th>
+            <th>Function</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="teachers: ${teachers.getContent()}">
+            <td><li type=""></li></td>
+            <td th:text="${teachers.username}"></td>
+            <td th:text="${teachers.userpwd}"></td>
+            <td th:text="${teachers.truename}"></td>
+            <td th:text="${teachers.classid}"></td>
+            <td>
+                <a th:onclick="'javascript:edit(\''+${teachers.userid}+'\');'" style="text-decoration: none;">
+                    <button class="btn btn-default" style="width: 50px;height: 30px;background: #3e8f3e">Modify</button>
+                </a>
+                <a th:onclick="'javascript:trash(\''+${teachers.userid}+'\');'" style="text-decoration: none;"
+                   data-toggle="modal" data-target="#trashModal">
+                    <button class="btn btn-default" style="width: 50px;height: 30px;background: red">
+                        Delete
+                    </button>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="row" style="margin-left: 18%">
+    <div class="col-md-6">Current <span th:text="${teachers.getNumber()} + 1"></span>page,total<span th:text="${teachers.totalPages}"></span>
+        page,total <span th:text="${teachers.totalElements}"></span> questions</div>
+    <div class="col-md-6">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li><a th:href="@{/AdminTeacherManage}">Main Page</a></li>
+                <li><a th:href="@{/AdminTeacherManage(pageNum = ${teachers.hasPrevious()} ? ${teachers.getNumber() } : 1)}">Previous page</a></li>
+                <li><a th:href="@{/AdminTeacherManage(pageNum = ${teachers.hasNext()} ? ${teachers.getNumber()} + 2 : ${teachers.totalPages})}">Next page</a></li>
+                <li><a th:href="@{/AdminTeacherManage(pageNum = ${teachers.totalPages})}">Last page</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</div>
+<div class="modal fade" id="addch" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="my" style="text-align:center">Add teacher</h4>
+            </div>
+            <form class="form-horizontal" th:action="@{/addTeacher}" method="post">
+                <div class="modal-body">
+                    <input name="roleid" value="1" hidden="hidden"/>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Work ID</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="username" class="form-control" id="username">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Password</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="userpwd" class="form-control" id="userpwd">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                    <label class="col-sm-2 control-label">Name</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="truename" class="form-control" id="truename">
+                        <span class="help-block"></span>
+                    </div>
+                </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Class</label>
+                        <div class="col-sm-5">
+                            <select class="form-control" id="classid" name="classid">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="addbut">Submit</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="editch" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myedit">Modify</h4>
+            </div>
+            <form class="form-horizontal" th:action="@{/updateTeacher}" method="post">
+                <div class="modal-body">
+                    <input name="userid"  hidden="hidden"/>
+                    <input name="roleid" value="1" hidden="hidden"/>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Work ID</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="username" class="form-control" id="username1">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Password</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="userpwd" class="form-control" id="userpwd1">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="truename" class="form-control" id="truename1">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Class</label>
+                        <div class="col-sm-5">
+                            <select class="form-control" id="classid1" name="classid">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="upaddbut">Submit</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="trashModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                </button>
+                <h4 class="modal-title">Delete！</h4>
+            </div>
+            <div class="modal-body">
+                <strong>Confirm Delete？</strong>
+                （All data will be deleted）
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="delSure btn btn-info" data-dismiss="modal">Confirm</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /.container-fluid -->
+</div>
+
+<!-- /#page-wrapper -->
+</div>
+
+</div>
+<script>
+
+    function add() {
+        getpoint();
+        $("#addch").modal({
+            backdrop: "static"
+        });
+    };
+    function getpoint() {
+        // $("#classid").empty();
+        $.ajax({
+            url: '/findAllClass',
+            type: 'POST',
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#classid").append("<option value='" + data[i].classid + "'>" + data[i].classname + "</option>");
+                }
+            }
+        });
+    }
+    function edit(userid) {
+        $.ajax({
+            url: '/findAllClass',
+            type: 'POST',
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#classid1").append("<option value='" + data[i].classid + "'>" + data[i].classname + "</option>");
+                }
+            }
+        });
+        if (!userid) {
+            alert("error");
+        } else {
+            $.ajax({
+                url: '/TeacherEdit',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({
+                    userid: userid
+                }),
+                success: function (data) {
+                    $("#userid").val(data.userid);
+                    $("#username1").val(data.username)
+                    $("#userpwd1").val(data.userpwd);
+                    $("#truename1").val(data.truename);
+                    $("#classid1").val(data.classid);
+                    $("#editch").modal('show');
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+    }
+    function trash(userid) {
+        if (!userid) {
+            alert("error");
+        } else {
+            $(".delSure").click(function () {
+                $.ajax({
+                    url: '/deleteTeacher?userid=' + userid,
+                    type: 'POST',
+                    success: function (data) {
+                        $("body").html(data);
+                    }
+                });
+            });
+        }
+    }
+</script>
+
+</body>
+</html>

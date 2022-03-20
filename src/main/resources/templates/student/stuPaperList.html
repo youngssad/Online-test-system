@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <div th:replace="include/bootstrap :: bootstrap"></div>
+</head>
+<body>
+<div th:replace="include/bootstrap :: StudentNav"></div>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <div class="row">
+                    <div th:each="exams:${stuexamlist}">
+                        <div class="col-md-4">
+                            <div class="thumbnail">
+                                <img alt="300x200" src="../img/peitu2.jpg" />
+                                <div class="caption">
+                                    <h3 class="pname" th:text="${exams.pname}"></h3>
+                                    <p>Total score: <span th:text="${exams.zscore}"></span></p>
+                                    <p>Score: <span th:text="${exams.score}"></span> &emsp;&emsp; </p>
+                                    <p class="beginTime">Finish time: <span th:text="${exams.tjtime}"></span></p>
+                                    <p>
+                                        <a class="btn btn-default btn-lg btn-block beginExam" th:onclick="'javascript:Stupaper(\''+${exams.seid}+'\')'">Answer sheet details</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+</div>
+<script th:inline="javascript">
+
+    function Stupaper(seid) {
+                var pname="";
+                $.ajax({
+                    url: '/findBySeid',
+                    type: 'POST',
+                    dataType: 'json',
+                    async:false,
+                    contentType: 'application/json;charset=UTF-8',
+                    data: JSON.stringify({
+                        seid: seid
+                    }),
+                    success: function (data) {
+                        pname = data.pname;
+                    },
+                    error: function () {
+                        alert("Error");
+                    }
+                });
+                if(pname!=''){
+                    $.ajax({
+                                url: '/findByPname',
+                                type: 'POST',
+                                dataType: 'json',
+                                async:false,
+                                contentType: 'application/json;charset=UTF-8',
+                                data: JSON.stringify({
+                                    pname: pname
+                                }),
+                                success: function (data) {
+                                    console.log("cg");
+                                    examtime = data.examtime;
+                                },
+                                error: function () {
+                                    alert("Error");
+                                }
+                            });
+                            var date = new Date();
+                            var seperator1 = "-";
+                            var year = date.getFullYear();
+                            var month = date.getMonth() + 1;
+                            var strDate = date.getDate();
+                            if (month >= 1 && month <= 9) {
+                                month = "0" + month;
+                            }
+                            if (strDate >= 0 && strDate <= 9) {
+                                strDate = "0" + strDate;
+                            }
+                            var currentdate = year + seperator1 + month + seperator1 + strDate;
+                            if(currentdate>examtime){
+                               window.location.href="stuPaper?seid="+seid;
+                            }else {
+                                alert("The test is in progress, please check after the test is over！");
+                            }
+                }
+    }
+
+</script>
+</body>
+</html>

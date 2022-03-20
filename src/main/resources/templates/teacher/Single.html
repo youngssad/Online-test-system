@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <div th:replace="include/bootstrap :: bootstrap"></div>
+</head>
+<body>
+<div th:replace="include/TeacherNav :: TeacherNav"></div>
+<script type="text/javascript">
+    $(function(){
+        $("#allAndNotAll").click(function() {
+            if (this.checked){
+                $("input[name='items']:checkbox").each(function(){
+                    $(this).attr("checked", true);
+                });
+            } else {
+                $("input[name='items']:checkbox").each(function() {
+                    $(this).attr("checked", false);
+                });
+            }
+        });
+
+        $('#getAllSelectedId').click(function(){
+            var ids=new Array();
+            $("input[name='items']:checked").each(function(){
+                ids.push($(this).attr("id"));
+            });
+            if(ids==""){
+                alert("Please select data to delete!")
+            }else {
+                location.href = "/deleteManySingle?ids=" + ids;
+            }
+        });
+    });
+</script>
+<div class="table-responsive" style="margin-left: 18%">
+    <table class="table table-striped"  >
+        <thead>
+        <tr>
+            <th colspan="5" style="text-align:left ;font-size: 20px"><button class="line btn btn-primary btn-sm" onclick="add()" >Add new question</button>&nbsp;&nbsp;&nbsp;
+                <button class="line btn btn-primary btn-sm" id="getAllSelectedId">Batch deletion</button></th>
+        </tr>
+        <tr>
+            <td ><input type="checkbox" id="allAndNotAll" />Select All/Deselect</td>
+            <th>ID</th>
+            <th>Course</th>
+            <th>Question type</th>
+            <th>A</th>
+            <th>B</th>
+            <th>C</th>
+            <th>D</th>
+            <th>Answer</th>
+            <th>Function</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="sublist: ${pageInfo.getContent()}">
+            <td><input type="checkbox" name="items" th:id="${sublist.sid}"/></td>
+            <td th:text="${sublist.sid}"></td>
+            <td th:text="${sublist.course.cname}"></td>
+            <td th:text="${sublist.scontent}"></td>
+            <td th:text="${sublist.sa}"></td>
+            <td th:text="${sublist.sb}"></td>
+            <td th:text="${sublist.sc}"></td>
+            <td th:text="${sublist.sd}"></td>
+            <td th:text="${sublist.skey}"></td>
+            <td>
+                <a th:onclick="'javascript:edit(\''+${sublist.sid}+'\');'" style="text-decoration: none;">
+                    <button class="btn btn-default" style="width: 50px;height: 30px;background: #3e8f3e">Modify</button>
+                </a>
+                <a th:onclick="'javascript:trash(\''+${sublist.sid}+'\');'" style="text-decoration: none;"
+                   data-toggle="modal" data-target="#trashModal">
+                    <button class="btn btn-default" style="width: 50px;height: 30px;background: red">
+                        Delete
+                    </button>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+    <div class="row" style="margin-left: 18%">
+        <div class="col-md-6">Present <span th:text="${pageInfo.getNumber()} + 1"></span>page,total<span th:text="${pageInfo.totalPages}"></span>
+            page,total <span th:text="${pageInfo.totalElements}"></span> questions</div>
+        <div class="col-md-6">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li><a th:href="@{/finddanxuan}">Main page</a></li>
+                    <li><a th:href="@{/finddanxuan(pageNum = ${pageInfo.hasPrevious()} ? ${pageInfo.getNumber() } : 1)}">Previous page</a></li>
+                    <li><a th:href="@{/finddanxuan(pageNum = ${pageInfo.hasNext()} ? ${pageInfo.getNumber()} + 2 : ${pageInfo.totalPages})}">Next page</a></li>
+                    <li><a th:href="@{/finddanxuan(pageNum = ${pageInfo.totalPages})}">Final page</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addch" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="my" style="text-align:center">Add question</h4>
+            </div>
+            <form class="form-horizontal" th:action="@{/addSingle}" method="post">
+                <div class="modal-body">
+                    <input name="stype" value="1" hidden="hidden"/>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon" style="height: 40px ; tab-size: 16px ">Question：</span>
+                        <textarea class="form-control" rows="3" name="scontent" id="scontent"></textarea>
+                    </div>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon" style="height: 40px ; tab-size: 16px ">A:</span>
+                        <textarea class="form-control" rows="3" name="sa" id="sa"></textarea>
+                    </div>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon" style="height: 40px ; tab-size: 16px ">B:</span>
+                        <textarea class="form-control" rows="3" name="sb" id="sb"></textarea>
+                    </div>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon" style="height: 40px ; tab-size: 16px ">C:</span>
+                        <textarea class="form-control" rows="3" name="sc" id="sc"></textarea>
+                    </div>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon" style="height: 40px ; tab-size: 16px ">D:</span>
+                        <textarea class="form-control" rows="3" name="sd" id="sd"></textarea>
+                    </div>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon" style="height: 40px ; tab-size: 16px ">Answer：</span>
+                        <div class="col-sm-5">
+                            <select class="form-control" id="skey" name="skey">
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Course</label>
+                        <div class="col-sm-5">
+                            <select class="form-control" id="cno" name="cno">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="addbut">Submit</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="editch" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myedit">Modify</h4>
+            </div>
+            <form class="form-horizontal" th:action="@{/updateSingle}" method="post">
+                <div class="modal-body">
+                    <input name="sid" id="sid1" hidden="hidden"/>
+                    <input name="stype" id="stype1" hidden="hidden"/>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon" style="height: 40px ; tab-size: 16px ">Question:</span>
+                        <textarea class="form-control" rows="3" name="scontent" id="scontent1"></textarea>
+                    </div>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon" style="height: 40px ; tab-size: 16px ">A:</span>
+                        <textarea class="form-control" rows="3" name="sa" id="sa1"></textarea>
+                    </div>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon" style="height: 40px ; tab-size: 16px ">B:</span>
+                        <textarea class="form-control" rows="3" name="sb" id="sb1"></textarea>
+                    </div>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon" style="height: 40px ; tab-size: 16px ">C:</span>
+                        <textarea class="form-control" rows="3" name="sc" id="sc1"></textarea>
+                    </div>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon" style="height: 40px ; tab-size: 16px ">D:</span>
+                        <textarea class="form-control" rows="3" name="sd" id="sd1"></textarea>
+                    </div>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon" style="height: 40px ; tab-size: 16px ">Answer:</span>
+                        <div class="col-sm-5">
+                            <select class="form-control" id="skey1" name="skey">
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Course</label>
+                        <div class="col-sm-5">
+                            <select class="form-control" id="cno1" name="cno">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="upaddbut">Submit</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="trashModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                </button>
+                <h4 class="modal-title">Delete!</h4>
+            </div>
+            <div class="modal-body">
+                <strong>Confirm delete?</strong>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="delSure btn btn-info" data-dismiss="modal">COnfirm</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /.container-fluid -->
+</div>
+
+<!-- /#page-wrapper -->
+</div>
+
+</div>
+<script>
+    function add() {
+         getpoint();
+        $("#addch").modal({
+            backdrop: "static"
+        });
+    };
+    function getpoint() {
+        $("#cno").empty();
+        $.ajax({
+            url: '/findAllCourse',
+            type: 'get',
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#cno").append("<option value='" + data[i].cno+ "'>" + data[i].cname + "</option>");
+                }
+            }
+        });
+    }
+    function edit(sid) {
+        $.ajax({
+            url: '/findAllCourse',
+            type: 'get',
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#cno1").append("<option value='" + data[i].cno + "'>" + data[i].cname + "</option>");
+                }
+            }
+        });
+        if (!sid) {
+            alert("error");
+        } else {
+            $.ajax({
+                url: '/findBySid',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({
+                    sid: sid
+                }),
+                success: function (data) {
+                    $("#sid1").val(data.sid);
+                    $("#stype1").val(data.stype)
+                    $("#scontent1").val(data.scontent);
+                    $("#sa1").val(data.sa);
+                    $("#sb1").val(data.sb);
+                    $("#sc1").val(data.sc);
+                    $("#sd1").val(data.sd);
+                    $("#skey1").val(data.skey);
+                    $("#cno1").val(data.cno);
+                    $("#editch").modal('show');
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+    }
+    function trash(sid) {
+        if (!sid) {
+            alert("error");
+        } else {
+            $(".delSure").click(function () {
+                $.ajax({
+                    url: '/deleteSingle?sid=' + sid,
+                    type: 'POST',
+                    success: function (data) {
+                        $("body").html(data);
+                    }
+                });
+            });
+        }
+    }
+</script>
+</body>
+</html>

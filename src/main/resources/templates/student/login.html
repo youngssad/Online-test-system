@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/common.css"/>
+    <link rel="stylesheet" href="css/font-awesome.min.css" />
+</head>
+<div class="wrap login_wrap">
+    <div class="content">
+        <div class="logo"></div>
+        <div class="login_box">
+
+            <div class="login_form">
+                <div class="login_title">Online exam</div>
+                <form th:action="@{/CanLogin}" method="post">
+                    <div class="form_text_ipt">
+                        <input name="username" type="text" placeholder="Username/StudentID">
+                    </div>
+                    <div class="ececk_warning"><span>Username/StudentID cant be empty</span></div>
+                    <div class="form_text_ipt">
+                        <input name="userpwd" type="password" placeholder="password">
+                    </div>
+                    <div class="ececk_warning"><span>Password cant be empty</span></div>
+                    <div id="nogg" style="text-align: center"><span style="color: red;text-align: center" id="sb" th:text="${session.errorInfo}"/></div>
+                    <input type="hidden" id="cxdl" th:value="${session.cxdl}"/>
+                    <script >
+                            var sb = document.getElementById("sb").innerText;
+                            if(sb!="") {
+                                setTimeout(function () {
+                                    document.getElementById("nogg").style.display = "none";
+                                    location.replace("./llogout")
+                                }, 1000);
+                            }
+                    </script>
+                    <script>
+                            var cxdl = document.getElementById("cxdl").value;
+                          if (cxdl!="") {
+                                alert("Password change successfull, please login！");
+                                location.replace("./llogout");
+                          }
+                    </script>
+                    <div class="form_check_ipt">
+                        <div class="left check_left">
+                            <label><input name="" type="checkbox"> Auto login next time</label>
+                        </div>
+                        <div class="right check_right">
+                            <a href="#">Forget password</a>
+                        </div>
+                    </div>
+                    <div class="form_btn">
+                        <button type="submit">Login</button>
+                    </div>
+                    <div class="form_reg_btn">
+                        <span>No account?</span><a th:href="@{/register}">Register</a>
+                    </div>
+                </form>
+                <div class="other_login">
+                    <div class="left other_left">
+                        <span>Login with other ways</span>
+                    </div>
+                    <div class="right other_right">
+                        <a href="#"><i class="fa fa-qq fa-2x"></i></a>
+                        <a href="#"><i class="fa fa-weixin fa-2x"></i></a>
+                        <a href="#"><i class="fa fa-weibo fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/jquery.min.js" ></script>
+<script type="text/javascript" src="js/common.js" ></script>
+</body>
+</html>

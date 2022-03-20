@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <div th:replace="include/bootstrap :: bootstrap"></div>
+</head>
+<body>
+<script>
+    $(function(){
+        $("#allAndNotAll").click(function() {
+            if (this.checked){
+                $("input[name='items']:checkbox").each(function(){
+                    $(this).attr("checked", true);
+                });
+            } else {
+                $("input[name='items']:checkbox").each(function() {
+                    $(this).attr("checked", false);
+                });
+            }
+        });
+
+        $('#getAllSelectedId').click(function(){
+            var ids=new Array();
+            $("input[name='items']:checked").each(function(){
+                ids.push($(this).attr("id"));
+            });
+            if(ids==""){
+                alert("Please select data to delete!")
+            }else {
+                if(confirm('All data related to this paper will be deleted, do you want to continue?')){
+                    location.href = "deleteManyStu?ids="+ids;
+                }
+
+            }
+
+        });
+    });
+    function add() {
+       window.location.href="/addexam"
+    }
+</script>
+<div th:replace="include/TeacherNav :: TeacherNav"></div>
+<div class="table-responsive" style="margin-left: 18%">
+    <table class="table table-striped"  >
+        <thead>
+        <tr>
+            <th colspan="5" style="text-align:left ;font-size: 20px"><button class="line btn btn-primary btn-sm" onclick="add()" >Add new exam paper</button>&nbsp;&nbsp;&nbsp;
+                <button class="line btn btn-primary btn-sm" id="getAllSelectedId">Batch deletion</button></th>
+        </tr>
+        <tr>
+            <td ><input type="checkbox" id="allAndNotAll" />Select All/Deselect</td>
+            <th>ID</th>
+            <th>Paper name</th>
+            <th>Number of single choice questions</th>
+            <th>Question Score</th>
+            <th>Number of multi choice questions</th>
+            <th>Question Score</th>
+            <th>Exam date</th>
+            <th>Exam time</th>
+            <th>Function</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="examlist: ${examlist.getContent()}">
+            <td><input type="checkbox" name="items" th:id="${examlist.eid}"/></td>
+            <td th:text="${examlist.eid}"></td>
+            <td th:text="${examlist.pname}"></td>
+            <td th:text="${examlist.singlenumber}"></td>
+            <td th:text="${examlist.singlecore}*${examlist.singlenumber}"></td>
+            <td th:text="${examlist.multiplenumber}"></td>
+            <td th:text="${examlist.multiplecore}*${examlist.multiplenumber}"></td>
+            <td th:text="${examlist.examdate}+'to'+${examlist.examtime}"></td>
+            <td th:text="${examlist.testtime}+'minute'"></td>
+            <td>
+                <a th:onclick="'javascript:edit(\''+${examlist.eid}+'\');'" style="text-decoration: none;">
+                    <button class="btn btn-default" style="width: 50px;height: 30px;background: #3e8f3e">Modify</button>
+                </a>
+                <a th:onclick="'javascript:trash(\''+${examlist.eid}+'\');'" style="text-decoration: none;"
+                   data-toggle="modal" data-target="#trashModal">
+                    <button class="btn btn-default" style="width: 50px;height: 30px;background: red">Delete</button>
+                </a>
+                <a  style="text-decoration: none;" th:href="@{'./paperDetails?eid='+${examlist.eid}}">
+                    <button class="btn btn-default" style="width: 80px;height: 30px;background: deepskyblue">
+                        Exam Paper Details
+                    </button>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+<div class="row" style="margin-left: 18%">
+    <div class="col-md-6">Present <span th:text="${examlist.getNumber()} + 1"></span>page,total<span th:text="${examlist.totalPages}"></span>
+        page,total <span th:text="${examlist.totalElements}"></span> records</div>
+    <div class="col-md-6">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li><a th:href="@{/selectexam}">Main page</a></li>
+                <li><a th:href="@{/selectexam(pageNum = ${examlist.hasPrevious()} ? ${examlist.getNumber() } : 1)}">Previous page</a></li>
+                <li><a th:href="@{/selectexam(pageNum = ${examlist.hasNext()} ? ${examlist.getNumber()} + 2 : ${examlist.totalPages})}">Next page</a></li>
+                <li><a th:href="@{/selectexam(pageNum = ${examlist.totalPages})}">Final page</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+<div class="modal fade" id="examdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="Label">Modify</h4>
+            </div>
+            <form class="form-horizontal" th:action="@{/updateExam}" method="post">
+                <div class="modal-body">
+                    <input name="eid" id="eid" hidden="hidden"/>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">paper name</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="pname" class="form-control" id="pname">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label class="col-sm-2 control-label">Course</label>
+                        <div class="col-sm-5">
+                            <select class="form-control" id="cno" name="cno">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label class="col-sm-2 control-label">Examiner</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="userid" class="form-control" id="userid"
+                                   placeholder="">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Class</label>
+                        <div class="col-sm-5">
+                            <select class="form-control" id="classid" name="classid">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label class="col-sm-2 control-label">Number of single choice questions</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="singlenumber" class="form-control" id="singlenumber"
+                                   placeholder="">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                    <label class="col-sm-2 control-label">Score for each question</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="singlecore" class="form-control" id="singlecore"
+                               placeholder="">
+                        <span class="help-block"></span>
+                    </div>
+                </div>
+                    <div class="form-group ">
+                        <label class="col-sm-2 control-label">Number of multi choice questions</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="multiplenumber" class="form-control" id="multiplenumber"
+                                   placeholder="">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label class="col-sm-2 control-label">Score for each question</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="multiplecore" class="form-control" id="multiplecore"
+                                   placeholder="">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label class="col-sm-2 control-label">Start time</label>
+                        <div class="col-sm-10">
+                            <input type="date" name="examdate" class="form-control" id="examdate"
+                                   placeholder="">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label class="col-sm-2 control-label">End time</label>
+                        <div class="col-sm-10">
+                            <input type="date" name="examtime" class="form-control" id="examtime"
+                                   placeholder="">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label class="col-sm-2 control-label">Exam time</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="testtime" class="form-control" id="testtime"
+                                   placeholder="">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="tch_save_btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="trashModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                </button>
+                <h4 class="modal-title">Delete!</h4>
+            </div>
+            <div class="modal-body">
+                <strong>Confirm delete?</strong>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="delSure btn btn-info" data-dismiss="modal">Confirm</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function trash(eid) {
+        if (!eid) {
+            alert("error");
+        } else {
+            $(".delSure").click(function () {
+                window.location.href="/deleteExam?eid="+eid;
+            });
+        }
+    }
+    function edit(eid) {
+        $.ajax({
+            url: '/findAllCourse',
+            type: 'get',
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#cno").append("<option value='" + data[i].cno + "'>" + data[i].cname + "</option>");
+                }
+            }
+        });
+        $.ajax({
+            url: '/findAllClass',
+            type: 'get',
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#classid").append("<option value='" + data[i].classid + "'>" + data[i].classname + "</option>");
+                }
+            }
+        });
+        if (!eid) {
+            alert("error");
+        } else {
+            $.ajax({
+                url: '/findByOneExam',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({
+                    eid: eid
+                }),
+                success: function (data) {
+                    $("#eid").val(data.eid);
+                    $("#pname").val(data.pname)
+                    $("#cno").val(data.cno);
+                    $("#userid").val(data.userid);
+                    $("#classid").val(data.classid);
+                    $("#singlenumber").val(data.singlenumber);
+                    $("#singlecore").val(data.singlecore);
+                    $("#multiplenumber").val(data.multiplenumber);
+                    $("#multiplecore").val(data.multiplecore);
+                    $('#examdate').val(data.examdate);
+                    $('#examtime').val(data.examtime);
+                    $('#testtime').val(data.testtime);
+                    $("#examdit").modal('show');
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>
